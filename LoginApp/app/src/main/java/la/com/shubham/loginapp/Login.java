@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +22,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.util.Log;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
@@ -27,7 +43,12 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
+import org.json.JSONObject;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -44,11 +65,38 @@ public class Login extends Activity implements GoogleApiClient.ConnectionCallbac
     private boolean mIntentInProgress;
     private ConnectionResult mConnectionResult;
 
+    private LoginButton loginButton;
+    private CallbackManager callbackManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        callbackManager = CallbackManager.Factory.create();
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
+
+
+
+        ///////////////////////////////////
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "la.com.shubham.loginapp",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+
+        } catch (NoSuchAlgorithmException e) {
+
+        }
+        /////////////////////////////////
+
+
+
 
         btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
         btnSignIn.setOnClickListener(this);
@@ -57,6 +105,7 @@ public class Login extends Activity implements GoogleApiClient.ConnectionCallbac
         etPassword = (EditText) findViewById(R.id.etpassword);
         bLogin = (Button) findViewById(R.id.btnlogin);
         register = (TextView) findViewById(R.id.tvRegister);
+        loginButton = (LoginButton)findViewById(R.id.login_button);
 
         bLogin.setOnClickListener(this);
         register.setOnClickListener(this);
@@ -70,8 +119,60 @@ public class Login extends Activity implements GoogleApiClient.ConnectionCallbac
                 .addApi(Plus.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN).build();
                 this.mGoogleApiClient.connect();
+        loginButton = (LoginButton)findViewById(R.id.login_button);
+        loginButton.setReadPermissions(Arrays.asList("public_profile", "email", "user_birthday"));
+
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                final AccessToken accessToken = loginResult.getAccessToken();
+                Log.d("ID", accessToken.getUserId());
+                String username = "+" + accessToken.getUserId();
+                final User user = new User(" ", -1, username, " ", " ");
+
+                GraphRequestAsyncTask request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+                    String name_fb;
+                    @Override
+                    public void onCompleted(JSONObject user, GraphResponse graphResponse) {
+                        String email = user.optString("email");
+                        name_fb = user.optString("name");
+
+                    }
+
+                }).executeAsync();
+
+
+
+                ServerRequest serverRequest = new ServerRequest(Login.this);
+                serverRequest.fetchUserDataInBackground(user, new GetUserCallBack() {
+
+                    @Override
+                    public void done(User returnedUser) {
+                        if (returnedUser == null) {
+                            registerUser(user);
+                        }
+                    }
+                });
+
+                logUserIn(user);
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+
+            }
+
+        });
+
 
     }
+
 
     @Override
     public void onClick(View v) {
@@ -141,6 +242,7 @@ public class Login extends Activity implements GoogleApiClient.ConnectionCallbac
                 mGoogleApiClient.connect();
             }
         }
+        callbackManager.onActivityResult(requestCode, responseCode, intent);
     }
 
 

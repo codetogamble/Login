@@ -19,7 +19,7 @@ import com.google.android.gms.plus.Plus;
 public class MainActivity extends Activity implements  View.OnClickListener {
 
 
-    Button btnLogout, btnProfile;
+    Button btnLogout, btnProfile, btnAbalone;
     GoogleApiClient mGoogleApiClient;
     UserLocalStore userLocalStore;
 
@@ -34,9 +34,11 @@ public class MainActivity extends Activity implements  View.OnClickListener {
 
         btnLogout = (Button) findViewById(R.id.button_logout);
         btnProfile = (Button) findViewById(R.id.button_profile);
+        btnAbalone = (Button) findViewById(R.id.button_abalone);
 
         btnProfile.setOnClickListener(this);
         btnLogout.setOnClickListener(this);
+        btnAbalone.setOnClickListener(this);
 
       /*  mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -58,6 +60,9 @@ public class MainActivity extends Activity implements  View.OnClickListener {
                userLocalStore.setLogout(true);
 
                 startActivity(new Intent(this, Login.class));
+                break;
+            case R.id.button_abalone:
+                startActivity(new Intent(this, SplashAcitvity.class));
                 break;
         }
     }

@@ -71,5 +71,11 @@
             android:id="@+id/button_logout"
             android:onClick="logout"/>
     </LinearLayout>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_abalone"
+        android:text="Abalone"/>
 </LinearLayout>
 
