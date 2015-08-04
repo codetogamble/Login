@@ -75,7 +75,15 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button_abalone"
-        android:text="Abalone"/>
+        android:text="Greenwall Game"
+        android:id="@+id/button_game_gw"/>
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Puzzle Game"
+        android:id="@+id/button_game_wbta"/>
+
+
+
 </LinearLayout>
 

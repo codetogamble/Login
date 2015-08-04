@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LoginApp.iml" filepath="$PROJECT_DIR$/LoginApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gw_library/gw_library.iml" filepath="$PROJECT_DIR$/gw_library/gw_library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wbta_library/wbta_library.iml" filepath="$PROJECT_DIR$/wbta_library/wbta_library.iml" />
     </modules>
   </component>
 </project>

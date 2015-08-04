@@ -12,7 +12,7 @@ import android.widget.EditText;
 public class ProfileActivity extends Activity {
 
     UserLocalStore userLocalStore;
-    EditText name, username ,age;
+    EditText name, username ,age, UserID;
 
 
     @Override
@@ -23,6 +23,7 @@ public class ProfileActivity extends Activity {
         name = (EditText) findViewById(R.id.etname);
         username = (EditText) findViewById(R.id.etusername);
         age = (EditText) findViewById(R.id.etage);
+        UserID = (EditText) findViewById(R.id.userID);
         userLocalStore = new UserLocalStore(this);
 
 
@@ -50,6 +51,7 @@ public class ProfileActivity extends Activity {
         User user = userLocalStore.getLoggedInUser();
         name.setText(user.getName());
         age.setText(user.getAge() + "");
+        UserID.setText(user.getUserID() + "");
         username.setText(user.getUsername());
     }
 

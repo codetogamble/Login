@@ -5,10 +5,18 @@ package la.com.shubham.loginapp;
  */
 public class User {
     private String name,username,password,email;
-    private Integer age;
+    private Integer age, UserID = -1;
 
     public String getEmail() {
         return email;
+    }
+
+    public void setUserID(Integer userID) {
+        this.UserID = userID;
+    }
+
+    public Integer getUserID() {
+        return UserID;
     }
 
     public void setEmail(String name) {

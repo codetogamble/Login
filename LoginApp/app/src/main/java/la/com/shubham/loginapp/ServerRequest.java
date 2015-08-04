@@ -57,6 +57,16 @@ public class ServerRequest {
         new FetchUserCountAsyncTask(user, userCallBack).execute();
     }
 
+    public void storeUserScoreData(GameData gameData, GetGameData getGameData){
+        progressDialog.show();
+        new StoreUserScoreDataAsyncTask(gameData , getGameData).execute();
+    }
+
+    public void fetchUserScoreData(GameData gameData, GetGameData getGameData){
+        progressDialog.show();
+        new FetchUserGameDataAsyncTask(gameData , getGameData).execute();
+    }
+
 
 
     public class StoreUserDataAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -148,11 +158,13 @@ public class ServerRequest {
                 } else {
                     String name = JObject.getString("name");
                     int age = JObject.getInt("age");
+                    int UserID = JObject.getInt("userID");
                     String username = JObject.getString("username");
                     String password = JObject.getString("password");
                     String email = JObject.getString("email");
 
                     returnedUser = new User(name, age, username, password, email);
+                    returnedUser.setUserID(UserID);
 
                 }
 
@@ -234,4 +246,109 @@ public class ServerRequest {
 
         }
     }
-}
+
+    public class StoreUserScoreDataAsyncTask extends  AsyncTask<Void,Void,Void>{
+
+        GameData gameData;
+        GetGameData getGameData;
+
+        public StoreUserScoreDataAsyncTask(GameData gameData, GetGameData getGameData){
+            this.gameData = gameData;
+            this.getGameData = getGameData;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+            dataToSend.add(new BasicNameValuePair("Username", gameData.getUsername()));
+            dataToSend.add(new BasicNameValuePair("GameID", gameData.getGameID().toString()));
+            dataToSend.add(new BasicNameValuePair("HighScore", gameData.getHighScore().toString()));
+
+            HttpParams httpRequestParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIMEOUT);
+            HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIMEOUT);
+
+            HttpClient client = new DefaultHttpClient(httpRequestParams);
+            HttpPost post = new HttpPost(SERVER_ADDRESS + "RegisterGameData.php");
+
+            try {
+                post.setEntity(new UrlEncodedFormEntity(dataToSend));
+                client.execute(post);
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            progressDialog.dismiss();
+            getGameData.done(null);
+
+            super.onPostExecute(aVoid);
+
+        }
+    }
+
+    public class FetchUserGameDataAsyncTask extends AsyncTask<Void , Void , GameData>{
+        GameData gameData;
+        GetGameData getGameData;
+
+        public FetchUserGameDataAsyncTask(GameData gameData, GetGameData getGameData){
+            this.gameData = gameData;
+            this.getGameData = getGameData;
+        }
+        @Override
+        protected GameData doInBackground(Void... params) {
+            ArrayList<NameValuePair> dataToSend = new ArrayList<>();
+            dataToSend.add(new BasicNameValuePair("Username", gameData.getUsername()));
+            dataToSend.add(new BasicNameValuePair("GameID", gameData.getGameID().toString()));
+
+            HttpParams httpRequestParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIMEOUT);
+            HttpConnectionParams.setSoTimeout(httpRequestParams, CONNECTION_TIMEOUT);
+
+            HttpClient client = new DefaultHttpClient(httpRequestParams);
+            HttpPost post = new HttpPost(SERVER_ADDRESS + "FetchUserGameData.php");
+
+            GameData returnedGameData = null;
+
+            try {
+                post.setEntity(new UrlEncodedFormEntity(dataToSend));
+                HttpResponse httpResponse = client.execute(post);
+
+                HttpEntity entity = httpResponse.getEntity();
+                String result = EntityUtils.toString(entity);
+                JSONObject JObject = new JSONObject(result);
+
+                if (JObject.length() == 0) {
+                    returnedGameData = null;
+                } else {
+                    String username = JObject.getString("Username");
+                    int GameID = JObject.getInt("GameID");
+                    int HighSCore = JObject.getInt("HighScore");
+
+
+                    returnedGameData = new GameData(username, GameID, HighSCore);
+
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return returnedGameData;
+        }
+
+        protected void onPostExecute(GameData returnedGameData) {
+            progressDialog.dismiss();
+            getGameData.done(returnedGameData);
+
+            super.onPostExecute(returnedGameData);
+
+        }
+    }
+    }

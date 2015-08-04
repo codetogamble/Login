@@ -128,15 +128,18 @@ public class Login extends Activity implements GoogleApiClient.ConnectionCallbac
                 final AccessToken accessToken = loginResult.getAccessToken();
                 Log.d("ID", accessToken.getUserId());
                 String username = "+" + accessToken.getUserId();
+                accessToken.getPermissions().contains("name");
+
                 final User user = new User(" ", -1, username, " ", " ");
 
                 GraphRequestAsyncTask request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
                     String name_fb;
                     @Override
-                    public void onCompleted(JSONObject user, GraphResponse graphResponse) {
-                        String email = user.optString("email");
-                        name_fb = user.optString("name");
-
+                    public void onCompleted(JSONObject userj, GraphResponse graphResponse) {
+                        String email = userj.optString("email");
+                        name_fb = userj.optString("name");
+                        Log.d("FB_name", name_fb );
+                        user.setName(name_fb);
                     }
 
                 }).executeAsync();

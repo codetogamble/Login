@@ -12,16 +12,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.bulsy.greenwall.MainActivity_gw;
+import com.bulsy.wbtempest.MainActivity_wbta;
+import com.bulsy.greenwall.PlayScreen;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 
 public class MainActivity extends Activity implements  View.OnClickListener {
 
 
-    Button btnLogout, btnProfile, btnAbalone;
-    GoogleApiClient mGoogleApiClient;
+    Button btnLogout, btnProfile , btnGameGw ,btnGameWbta;
     UserLocalStore userLocalStore;
+    Integer hiScore;
+    private static final String HISCORE_FILE = "gwhs.dat";
+
 
 
     @Override
@@ -34,19 +42,18 @@ public class MainActivity extends Activity implements  View.OnClickListener {
 
         btnLogout = (Button) findViewById(R.id.button_logout);
         btnProfile = (Button) findViewById(R.id.button_profile);
-        btnAbalone = (Button) findViewById(R.id.button_abalone);
+
+        btnGameGw = (Button) findViewById(R.id.button_game_gw);
+        btnGameWbta = (Button) findViewById(R.id.button_game_wbta);
+
 
         btnProfile.setOnClickListener(this);
         btnLogout.setOnClickListener(this);
-        btnAbalone.setOnClickListener(this);
 
-      /*  mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN).build();
-        Log.d("LoginApp", "Connecting");
-        this.mGoogleApiClient.connect();*/
+        btnGameGw.setOnClickListener(this);
+        btnGameWbta.setOnClickListener(this);
+
+
 
     }
 
@@ -58,12 +65,30 @@ public class MainActivity extends Activity implements  View.OnClickListener {
                 break;
             case R.id.button_logout:
                userLocalStore.setLogout(true);
-
                 startActivity(new Intent(this, Login.class));
                 break;
-            case R.id.button_abalone:
-                startActivity(new Intent(this, SplashAcitvity.class));
+            case R.id.button_game_gw:
+
+                startActivity(new Intent(this, MainActivity_gw.class));
                 break;
+            case R.id.button_game_wbta:
+                startActivity(new Intent(this, MainActivity_wbta.class));
+                break;
+
+
         }
     }
+
+//    public Integer ReadHighScoreGw(){
+//        Integer hiscore=0;
+//        try {
+//            BufferedReader f = new BufferedReader(new FileReader(MainActivity.getFilesDir() + HISCORE_FILE));
+//            hiscore = Integer.parseInt(f.readLine());
+//            f.close();
+//        } catch (Exception e) {
+//            Log.d("Greenie", "ReadHiScore", e);
+//        }
+//        return(hiscore);
+//    }
+
 }

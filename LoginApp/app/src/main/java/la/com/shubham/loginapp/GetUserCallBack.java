@@ -9,6 +9,7 @@ interface GetUserCallBack {
      * @param returnedUser
      */
     public abstract void done(User returnedUser);
+   // public abstract void done()
 
 
 

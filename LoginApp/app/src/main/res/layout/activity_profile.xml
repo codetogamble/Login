@@ -36,6 +36,15 @@
         android:layout_marginBottom="10dp"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:layout_width = "wrap_content"
+        android:text = "UserID"
+        android:layout_height = "wrap_content"/>
+    <EditText
+        android:id="@+id/userID"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_height="wrap_content" />
 
     <Button
         android:layout_width="wrap_content"

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
  */
 public class UserLocalStore {
     public static final String SP_NAME = "userDetails";
+
     //User user;
     SharedPreferences userStore;
 
@@ -15,16 +16,27 @@ public class UserLocalStore {
         userStore = context.getSharedPreferences(SP_NAME,0);
     }
 
+
     public void saveUser(User user){
 
         SharedPreferences.Editor spEditor = userStore.edit();
         spEditor.putString("name", user.getName());
         spEditor.putInt("age", user.getAge());
+        spEditor.putInt("UserID", user.getUserID());
         spEditor.putString("username", user.getUsername());
         spEditor.putString("password", user.getPassword());
         spEditor.putString("email_id", user.getEmail());
         spEditor.commit();
     }
+
+    public void saveGameData(GameData gameData){
+        SharedPreferences.Editor spEditor = userStore.edit();
+        spEditor.putInt("HighScore" , gameData.getHighScore());
+        spEditor.putInt("GameID" , gameData.getGameID());
+        spEditor.apply();
+    }
+
+
     public User getLoggedInUser() {
 
             String name = userStore.getString("name", "");
@@ -32,8 +44,11 @@ public class UserLocalStore {
             String password = userStore.getString("password", "");
             String email = userStore.getString("email_id", "");
             Integer age = userStore.getInt("age", -1);
+            Integer UserID = userStore.getInt("UserID", -1);
 
-            return new User(name, age, username, password,email);
+            User user = new User(name, age, username, password,email);
+            user.setUserID(UserID);
+            return user;
 
     }
 
