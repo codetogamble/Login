@@ -16,6 +16,7 @@ import com.bulsy.greenwall.MainActivity_gw;
 import com.bulsy.wbtempest.MainActivity_wbta;
 import com.bulsy.greenwall.PlayScreen;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Game;
 import com.google.android.gms.plus.Plus;
 
 import java.io.BufferedReader;
@@ -27,10 +28,21 @@ public class MainActivity extends Activity implements  View.OnClickListener {
 
     Button btnLogout, btnProfile , btnGameGw ,btnGameWbta;
     UserLocalStore userLocalStore;
-    Integer hiScore;
+    User user;
+    Integer hiScore_gw,hiScore_wbta;
+    static final int REQ_CODE_GW= 153;
+    static final int REQ_CODE_WBTA= 154;
     private static final String HISCORE_FILE = "gwhs.dat";
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +50,7 @@ public class MainActivity extends Activity implements  View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         userLocalStore = new UserLocalStore(this);
-
+        user = userLocalStore.getLoggedInUser();
 
         btnLogout = (Button) findViewById(R.id.button_logout);
         btnProfile = (Button) findViewById(R.id.button_profile);
@@ -68,27 +80,45 @@ public class MainActivity extends Activity implements  View.OnClickListener {
                 startActivity(new Intent(this, Login.class));
                 break;
             case R.id.button_game_gw:
-
-                startActivity(new Intent(this, MainActivity_gw.class));
+                Intent intent = new Intent(MainActivity.this, MainActivity_gw.class);
+                startActivityForResult(intent, REQ_CODE_GW);
                 break;
             case R.id.button_game_wbta:
-                startActivity(new Intent(this, MainActivity_wbta.class));
+                Intent intent1 = new Intent(MainActivity.this, MainActivity_wbta.class);
+                startActivityForResult(intent1, REQ_CODE_WBTA);
                 break;
 
 
         }
     }
+    public void saveScoreData(GameData gameData, GetGameData getGameData){
+        ServerRequest serverRequest = new ServerRequest(this);
+        serverRequest.storeUserScoreData(gameData, getGameData);
 
-//    public Integer ReadHighScoreGw(){
-//        Integer hiscore=0;
-//        try {
-//            BufferedReader f = new BufferedReader(new FileReader(MainActivity.getFilesDir() + HISCORE_FILE));
-//            hiscore = Integer.parseInt(f.readLine());
-//            f.close();
-//        } catch (Exception e) {
-//            Log.d("Greenie", "ReadHiScore", e);
-//        }
-//        return(hiscore);
-//    }
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    switch (requestCode){
+        case (REQ_CODE_GW):
+            if(resultCode ==1) {
+                hiScore_gw = new Integer(data.getIntExtra("Hi_Score", 0));
+                Log.d("HiScore", hiScore_gw.toString());
+                final GameData gameData = new GameData(user.getUsername(), 1, hiScore_gw);
+                saveScoreData(gameData, new GetGameData() {
+                    @Override
+                    public void done(GameData returnedGameData) {
+
+                                            }
+                });
+            }
+    }
+    }
 }

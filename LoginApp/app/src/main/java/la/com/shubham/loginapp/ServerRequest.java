@@ -260,9 +260,9 @@ public class ServerRequest {
         @Override
         protected Void doInBackground(Void... params) {
             ArrayList<NameValuePair> dataToSend = new ArrayList<>();
-            dataToSend.add(new BasicNameValuePair("Username", gameData.getUsername()));
-            dataToSend.add(new BasicNameValuePair("GameID", gameData.getGameID().toString()));
-            dataToSend.add(new BasicNameValuePair("HighScore", gameData.getHighScore().toString()));
+            dataToSend.add(new BasicNameValuePair("username", gameData.getUsername()));
+            dataToSend.add(new BasicNameValuePair("gameID", gameData.getGameID().toString()));
+            dataToSend.add(new BasicNameValuePair("highScore", gameData.getHighScore().toString()));
 
             HttpParams httpRequestParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpRequestParams, CONNECTION_TIMEOUT);
